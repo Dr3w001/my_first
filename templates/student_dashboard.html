@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">Student Dashboard</h1>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Welcome, {{ user.username }}</h5>
+                    <p class="card-text">{{ user.email }}</p>
+                    <div class="d-grid gap-2">
+                        <a href="/student/schedule" class="btn btn-primary">Schedule Lesson</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Quick Links</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><a href="#scheduled-lessons">Scheduled Lessons</a></li>
+                        <li class="list-group-item"><a href="#progress">My Progress</a></li>
+                        <li class="list-group-item"><a href="#payments">Payment History</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="card mb-4" id="scheduled-lessons">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Scheduled Lessons</h5>
+                </div>
+                <div class="card-body">
+                    {% if lessons %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Vehicle Class</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Payment</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for lesson in lessons %}
+                                        <tr>
+                                            <td>{{ lesson.vehicle_class }}</td>
+                                            <td>{{ lesson.date.strftime('%d %b %Y, %H:%M') }}</td>
+                                            <td>
+                                                {% if lesson.status == 'scheduled' %}
+                                                    <span class="badge bg-warning">Scheduled</span>
+                                                {% elif lesson.status == 'completed' %}
+                                                    <span class="badge bg-success">Completed</span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">Cancelled</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if lesson.payment_status == 'pending' %}
+                                                    <span class="badge bg-danger">Unpaid</span>
+                                                {% else %}
+                                                    <span class="badge bg-success">Paid</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if lesson.payment_status == 'pending' %}
+                                                    <a href="/student/payment/{{ lesson.id }}" class="btn btn-sm btn-primary">Pay Now</a>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-center">No lessons scheduled yet. <a href="/student/schedule">Schedule a lesson</a>.</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card mb-4" id="progress">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">My Progress</h5>
+                </div>
+                <div class="card-body">
+                    {% if progress %}
+                        {% for prog in progress %}
+                            <div class="progress-container">
+                                <h6>{{ prog.vehicle_class }} - {{ prog.lessons_completed }} of {{ prog.total_lessons }} lessons completed</h6>
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" style="width: {{ (prog.lessons_completed / prog.total_lessons) * 100 }}%;" 
+                                         aria-valuenow="{{ prog.lessons_completed }}" aria-valuemin="0" aria-valuemax="{{ prog.total_lessons }}">
+                                        {{ (prog.lessons_completed / prog.total_lessons) * 100 }}%
+                                    </div>
+                                </div>
+                                <p class="mt-2">
+                                    {% if prog.status == 'completed' %}
+                                        <span class="badge bg-success">Course Completed</span>
+                                    {% else %}
+                                        <span class="badge bg-info">In Progress</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-center">No progress data available yet. Start by scheduling your first lesson.</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card" id="payments">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Payment History</h5>
+                </div>
+                <div class="card-body">
+                    {% if user.payments %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Amount</th>
+                                        <th>Payment Method</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for payment in user.payments %}
+                                        <tr>
+                                            <td>{{ payment.created_at.strftime('%d %b %Y') }}</td>
+                                            <td>${{ payment.amount }}</td>
+                                            <td>{{ payment.payment_method }}</td>
+                                            <td>
+                                                {% if payment.status == 'completed' %}
+                                                    <span class="badge bg-success">Completed</span>
+                                                {% elif payment.status == 'pending' %}
+                                                    <span class="badge bg-warning">Pending</span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">Failed</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-center">No payment history available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

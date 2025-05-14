@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="form-container">
+                <h2 class="text-center mb-4">Schedule a Lesson</h2>
+                <form method="POST" action="/student/schedule">
+                    <div class="mb-3">
+                        <label for="vehicle_class" class="form-label">Vehicle Class</label>
+                        <select class="form-select" id="vehicle_class" name="vehicle_class" required>
+                            <option value="" selected disabled>Select a vehicle class</option>
+                            <option value="Class 1">Class 1 - Light Vehicles</option>
+                            <option value="Class 2">Class 2 - Medium Commercial Vehicles</option>
+                            <option value="Class 3">Class 3 - Heavy Commercial Vehicles</option>
+                            <option value="Class 4">Class 4 - Public Service Vehicles</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="date" class="form-label">Date and Time</label>
+                        <input type="datetime-local" class="form-control" id="date" name="date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Additional Notes (Optional)</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Schedule Lesson</button>
+                        <a href="/student/dashboard" class="btn btn-secondary">Back to Dashboard</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

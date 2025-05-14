@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">Instructor Dashboard</h1>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Welcome, {{ user.username }}</h5>
+                    <p class="card-text">{{ user.email }}</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Quick Links</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><a href="#pending-lessons">Pending Lessons</a></li>
+                        <li class="list-group-item"><a href="#student-progress">Student Progress</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="card mb-4" id="pending-lessons">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Pending Lessons</h5>
+                </div>
+                <div class="card-body">
+                    {% if pending_lessons %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>Vehicle Class</th>
+                                        <th>Date</th>
+                                        <th>Payment Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for lesson in pending_lessons %}
+                                        <tr>
+                                            <td>{{ lesson.student.username }}</td>
+                                            <td>{{ lesson.vehicle_class }}</td>
+                                            <td>{{ lesson.date.strftime('%d %b %Y, %H:%M') }}</td>
+                                            <td>
+                                                {% if lesson.payment_status == 'pending' %}
+                                                    <span class="badge bg-danger">Unpaid</span>
+                                                {% else %}
+                                                    <span class="badge bg-success">Paid</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-success">Mark Complete</button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-center">No pending lessons at the moment.</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card" id="student-progress">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Student Progress</h5>
+                </div>
+                <div class="card-body">
+                    {% if students_progress %}
+                        <div class="accordion" id="studentProgressAccordion">
+                            {% for student, progress in students_progress %}
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading{{ student.id }}">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                                data-bs-target="#collapse{{ student.id }}" aria-expanded="false" aria-controls="collapse{{ student.id }}">
+                                            {{ student.username }} - {{ progress.vehicle_class }}
+                                        </button>
+                                    </h2>
+                                    <div id="collapse{{ student.id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ student.id }}" 
+                                         data-bs-parent="#studentProgressAccordion">
+                                        <div class="accordion-body">
+                                            <div class="progress-container">
+                                                <h6>{{ progress.lessons_completed }} of {{ progress.total_lessons }} lessons completed</h6>
+                                                <div class="progress">
+                                                    <div class="progress-bar" role="progressbar" 
+                                                         style="width: {{ (progress.lessons_completed / progress.total_lessons) * 100 }}%;" 
+                                                         aria-valuenow="{{ progress.lessons_completed }}" aria-valuemin="0" 
+                                                         aria-valuemax="{{ progress.total_lessons }}">
+                                                        {{ (progress.lessons_completed / progress.total_lessons) * 100 }}%
+                                                    </div>
+                                                </div>
+                                                <p class="mt-2">
+                                                    {% if progress.status == 'completed' %}
+                                                        <span class="badge bg-success">Course Completed</span>
+                                                    {% else %}
+                                                        <span class="badge bg-info">In Progress</span>
+                                                    {% endif %}
+                                                </p>
+                                                <div class="mt-3">
+                                                    <h6>Student Details:</h6>
+                                                    <p>Email: {{ student.email }}<br>
+                                                    Joined: {{ student.created_at.strftime('%d %b %Y') }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-center">No student progress data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

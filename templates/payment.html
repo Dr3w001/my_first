@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="form-container">
+                <h2 class="text-center mb-4">Make Payment</h2>
+                <div class="alert alert-info">
+                    <p class="mb-0"><strong>Lesson Details:</strong> {{ lesson.vehicle_class }} on {{ lesson.date.strftime('%d %b %Y, %H:%M') }}</p>
+                </div>
+                <form method="POST" action="/student/payment/{{ lesson.id }}">
+                    <div class="mb-3">
+                        <label for="amount" class="form-label">Amount ($)</label>
+                        <input type="number" class="form-control" id="amount" name="amount" value="50.00" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="payment_method" class="form-label">Payment Method</label>
+                        <select class="form-select" id="payment_method" name="payment_method" required>
+                            <option value="" selected disabled>Select payment method</option>
+                            <option value="Credit Card">Credit Card</option>
+                            <option value="Debit Card">Debit Card</option>
+                            <option value="PayPal">PayPal</option>
+                            <option value="Mobile Money">Mobile Money</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                            <option value="Cash">Cash</option>
+                        </select>
+                    </div>
+                    
+                    <div id="credit-card-details" class="payment-details">
+                        <div class="mb-3">
+                            <label for="card_number" class="form-label">Card Number</label>
+                            <input type="text" class="form-control" id="card_number" placeholder="1234 5678 9012 3456">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="expiry_date" class="form-label">Expiry Date</label>
+                                <input type="text" class="form-control" id="expiry_date" placeholder="MM/YY">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="cvv" class="form-label">CVV</label>
+                                <input type="text" class="form-control" id="cvv" placeholder="123">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="card_name" class="form-label">Name on Card</label>
+                            <input type="text" class="form-control" id="card_name" placeholder="John Doe">
+                        </div>
+                    </div>
+                    
+                    <div id="mobile-money-details" class="payment-details" style="display: none;">
+                        <div class="mb-3">
+                            <label for="phone_number" class="form-label">Phone Number</label>
+                            <input type="text" class="form-control" id="phone_number" placeholder="+263 7XX XXX XXX">
+                        </div>
+                    </div>
+                    
+                    <div id="bank-transfer-details" class="payment-details" style="display: none;">
+                        <div class="alert alert-info">
+                            <p><strong>Bank Details:</strong></p>
+                            <p>Bank: Example Bank<br>
+                            Account Name: Professional Driving School<br>
+                            Account Number: 1234567890<br>
+                            Branch Code: 123456</p>
+                            <p>Please use your name as reference.</p>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reference" class="form-label">Reference Number</label>
+                            <input type="text" class="form-control" id="reference" placeholder="Enter bank reference">
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Complete Payment</button>
+                        <a href="/student/dashboard" class="btn btn-secondary">Back to Dashboard</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('payment_method').addEventListener('change', function() {
+        // Hide all payment details sections
+        const paymentDetails = document.querySelectorAll('.payment-details');
+        paymentDetails.forEach(section => {
+            section.style.display = 'none';
+        });
+        
+        // Show the relevant section based on selection
+        const selectedMethod = this.value;
+        if (selectedMethod === 'Credit Card' || selectedMethod === 'Debit Card') {
+            document.getElementById('credit-card-details').style.display = 'block';
+        } else if (selectedMethod === 'Mobile Money') {
+            document.getElementById('mobile-money-details').style.display = 'block';
+        } else if (selectedMethod === 'Bank Transfer') {
+            document.getElementById('bank-transfer-details').style.display = 'block';
+        }
+    });
+</script>
+{% endblock %}
